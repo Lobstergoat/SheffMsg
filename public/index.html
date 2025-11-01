@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Leave a Message</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+
+  <div id="splash" style="display:none">
+    <div id="splashText" class="splash-message">Loading...</div>
+  </div>
+
+  <main class="container hidden">
+    <h1 class="site-title">Previous Message:</h1>
+    
+    <section class="message-box">
+      <div id="currentMessage" class="current-message">No previous message found :(</div>
+      <div id="timestamp" class="timestamp">Message created at: </div>
+    </section>
+
+    <section class="form-section">
+      <form id="messageForm">
+        <h1 class="site-title">Leave a message for the next person</h1>
+        <textarea id="messageInput" maxlength="100" placeholder="Type your message..." required></textarea>
+
+        <div class="controls control-column">
+          <div class="control">
+            <div class="label">Background</div>
+            <div class="swatches" id="bgSwatches"></div>
+          </div>
+
+          <div class="control">
+            <label class="label" for="fontSelect">Font</label>
+            <select id="fontSelect" class="styled-select">
+              <option value="system-ui">System</option>
+              <option value="Georgia">Georgia</option>
+              <option value="Times New Roman">Times New Roman</option>
+              <option value="Arial">Arial</option>
+              <option value="monospace">Monospace</option>
+              <option value="cursive">Cursive</option>
+            </select>
+          </div>
+
+          <div class="control">
+            <label class="label" for="sizeSelect">Text size</label>
+            <select id="sizeSelect" class="styled-select">
+              <option value="small">Small</option>
+              <option value="medium" selected>Medium</option>
+              <option value="large">Large</option>
+            </select>
+          </div>
+
+          <div class="control">
+            <label class="label">Inspiration (Or just say whatever you want)</label>
+            <div class="inspiration-container">
+              <input type="text" id="inspo" class="styled-input" readonly value="Tell your best joke" aria-label="Inspiration prompt">
+              <button type="button" id="refreshInspo" class="refresh-btn" aria-label="Get new inspiration">🔄</button>
+            </div>
+          </div>
+
+        </div>
+
+        <button type="submit">Submit</button>
+        <div id="formStatus" class="status" role="status" aria-live="polite"></div>
+      </form>
+    </section>
+  </main>
+
+  <script src="/index.js" defer></script>
+</body>
+<!--
+  To create QR codes, link to: ?location=some-id e.g., https://yourdomain.com/?location=park-1
+-->
+</html>
+
+

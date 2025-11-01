@@ -1,0 +1,32 @@
+{
+  "name": "sheffmsg",
+  "version": "1.0.0",
+  "description": "QR message board: show last message, leave a message for the next person",
+  "main": "src/app.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "migrate": "node src/db.js migrate",
+    "db:clear": "node src/db.js clear",
+    "qr": "node tools/generate-qrs.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "basic-auth": "^2.0.1",
+    "better-sqlite3": "^11.7.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
+    "helmet": "^7.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0",
+    "qrcode": "^1.5.3"
+  }
+}
+
+

@@ -1,0 +1,19 @@
+version: '3.9'
+services:
+  sheffmsg:
+    build: .
+    image: sheffmsg:latest
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - ADMIN_USER=${ADMIN_USER:-admin}
+      - ADMIN_PASS=${ADMIN_PASS:-changeme}
+      - PUBLIC_BASE_URL=${PUBLIC_BASE_URL:-http://localhost:3000}
+      - CORS_ORIGINS=${CORS_ORIGINS:-}
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/app/data
+
+

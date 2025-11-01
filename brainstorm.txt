@@ -1,0 +1,14 @@
+
+
+- Have prompts for what to say
+ - "What was something that made you smile"
+ - "Tell your best joke"
+ - "Leave a pickup line"
+ - "Say something inspiring"
+ - "What are you doing right now"
+ - "Whats your favourite thing ever"
+ - "Reccomend a movie"
+ 
+- Have QR's for locations (messages from the park, bus, uni ect)
+- Let users see list of prev messages
+- 
