@@ -171,26 +171,26 @@ const inspirations = [
   "Leave a message for your future self",
   "Reccomend a food place in Sheffield",
   "Tell a story in 100 characters",
-  "What was something that made you smile",
+  "Something that made you smile",
   "Leave a secret you know :0",
   "Say something you know is true",
   "What is your FAVOURITE song",
   "Leave your name :D",
-  "Whats the name of the person you love",
-  "Describe your favorite place in the world",
-  "What's something you want to try this year",
-  "What's a book you've read recently that you loved",
+  "The name of the person you love",
+  "Your favorite place in the world",
+  "Something you want to try",
+  "Your favourite book",
   "Yes or No?",
   "What superpower would you want",
   "Leave your instagram XD",
   "Confess your most irrational opinion",
   "Favourite Food",
-  "Make up a fake law everyone must now obey",
+  "Make something up",
   "Describe yourself in 3 words",
   "Tell the next person about your ex",
   "Leave a threat >:)",
   "What was the last thing you searched",
-  "Ask a question for the next person to answer"
+  "Ask a question for the next person"
 ];
 
 const inspoElement = document.getElementById("inspo");
