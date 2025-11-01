@@ -98,12 +98,9 @@ body { background: var(--bg); color: var(--fg); }
   color: var(--fg);
 }
 
-/* On small screens, stack the input and button */
+/* On small screens, stack the input and button
 @media (max-width: 600px) {
-  .inspiration-container {
-    flex-direction: column;
-  }
   .refresh-btn {
     width: 100%;
   }
-}
+} */
