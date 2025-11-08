@@ -11,4 +11,6 @@
  
 - Have QR's for locations (messages from the park, bus, uni ect)
 - Let users see list of prev messages
+- See them in a grid
+- Choose bg colour
 - 
