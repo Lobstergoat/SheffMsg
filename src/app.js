@@ -102,6 +102,15 @@ app.get('/api/message', (req, res) => {
   });
 });
 
+// API: get all messages (for grid view)
+app.get('/api/messages/all', (req, res) => {
+  const location = SINGLE_FEED_LOCATION;
+  const rows = db.prepare(
+    'SELECT id, message, created_at, bg_color, font_family, text_size FROM messages WHERE location = ? ORDER BY created_at DESC, id DESC'
+  ).all(location);
+  res.json({ messages: rows });
+});
+
 // API: post a new message (single feed)
 app.post('/api/message', postLimiter, (req, res) => {
   const location = SINGLE_FEED_LOCATION;

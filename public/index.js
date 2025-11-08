@@ -10,6 +10,7 @@ const sizeSelectEl = document.getElementById('sizeSelect');
 const splashEl = document.getElementById('splash');
 const splashTextEl = document.getElementById('splashText');
 const mainEl = document.querySelector('main.container');
+const viewAllSectionEl = document.getElementById('viewAllSection');
 
 const ALLOWED_BG = ['#a6ff9d', '#fbffad', '#3ebfcd', '#973ecd', '#cd3ec1', '#cd763e'];
 
@@ -150,6 +151,11 @@ form.addEventListener('submit', async (e) => {
       textSize: sizeSelectEl?.value
     });
     input.value = '';
+    // Show the "View All Messages" button
+    if (viewAllSectionEl) {
+      viewAllSectionEl.style.display = 'block';
+      sessionStorage.setItem('hasPosted', '1');
+    }
     await loadMessage();
   } catch (e) {
     statusEl.textContent = 'Network error, please try again.';
@@ -205,3 +211,7 @@ setRandomInspo();
 
 refreshButton.addEventListener("click", setRandomInspo);
 
+// Check if user has posted before and show the button
+if (sessionStorage.getItem('hasPosted') === '1' && viewAllSectionEl) {
+  viewAllSectionEl.style.display = 'block';
+}

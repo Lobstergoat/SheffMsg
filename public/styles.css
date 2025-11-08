@@ -102,6 +102,28 @@ body { background: var(--bg); color: var(--fg); }
   color: var(--fg);
 }
 
+.view-all-section {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.view-all-btn {
+  display: inline-block;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  background: #2b3138;
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 1.1rem;
+  text-decoration: none;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.view-all-btn:hover {
+  background: #30363d;
+  transform: translateY(-2px);
+}
+
 /* On small screens, stack the input and button
 @media (max-width: 600px) {
   .refresh-btn {

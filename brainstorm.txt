@@ -1,4 +1,4 @@
-
+THOUGHHHTS
 
 - Have prompts for what to say
  - "What was something that made you smile"
@@ -13,4 +13,3 @@
 - Let users see list of prev messages
 - See them in a grid
 - Choose bg colour
-- 
