@@ -54,7 +54,7 @@ function validateMessage(raw) {
 }
 
 const ALLOWED_BG = [
-  '#a6ff9d', '#fbffad', '#3ebfcd', '#973ecd', '#cd3ec1', '#cd763e'
+  '#a6ff9d', '#fbffad', '#3ebfcd', '#973ecd', '#cd3ec1', '#cd763e', '#ff0020' , '#0500ff'
 ];
 const ALLOWED_FONT = [
   'system-ui', 'serif', 'monospace', 'cursive', 'fantasy', 'Georgia', 'Times New Roman', 'Arial'

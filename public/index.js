@@ -12,7 +12,7 @@ const splashTextEl = document.getElementById('splashText');
 const mainEl = document.querySelector('main.container');
 const viewAllSectionEl = document.getElementById('viewAllSection');
 
-const ALLOWED_BG = ['#a6ff9d', '#fbffad', '#3ebfcd', '#973ecd', '#cd3ec1', '#cd763e'];
+const ALLOWED_BG = ['#a6ff9d', '#fbffad', '#3ebfcd', '#973ecd', '#cd3ec1', '#cd763e', '#ff0020', '#0500ff'];
 
 // Build color swatches
 if (bgSwatchesEl) {
