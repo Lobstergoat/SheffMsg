@@ -1,4 +1,5 @@
 const messagesGridEl = document.getElementById('messagesGrid');
+const sb = window.sheffmsgSupabase;
 
 const sizeMap = {
   small: '1rem',

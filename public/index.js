@@ -12,6 +12,8 @@ const splashTextEl = document.getElementById('splashText');
 const mainEl = document.querySelector('main.container');
 const viewAllSectionEl = document.getElementById('viewAllSection');
 
+const sb = window.sheffmsgSupabase;
+
 const ALLOWED_BG = ['#a6ff9d', '#fbffad', '#3ebfcd', '#973ecd', '#cd3ec1', '#cd763e', '#ff0020', '#0500ff'];
 
 // Build color swatches
@@ -82,8 +84,21 @@ if (sizeSelectEl) {
 
 async function loadMessage() {
   try {
-    const res = await fetch(`/api/message`);
-    const data = await res.json();
+    // const res = await fetch(`/api/message`);
+    // const data = await res.json();
+
+    const { data, error } = await sb
+    .from('messages')
+    .insert({
+      location: 'default',
+      message,
+      bg_color: bgSwatchesEl?.dataset.selected || null,
+      font_family: fontSelectEl?.value || 'system-ui',
+      text_size: sizeSelectEl?.value || 'medium'
+    })
+    .select('created_at, bg_color, font_family, text_size')
+    .single();
+
     if (data.message) {
       currentMessageEl.textContent = data.message;
       timestampEl.textContent = new Date(data.createdAt).toLocaleString();
