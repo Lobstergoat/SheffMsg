@@ -53,7 +53,7 @@ function createMessageCard(msg) {
   meta.textContent = formatDate(msg.created_at);
 
   card.appendChild(text);
-  card.appendChild(meta);
+  //card.appendChild(meta);
 
   return card;
 }
