@@ -23,7 +23,21 @@ const ALLOWED_BG = [
   '#cd763e'
 ];
 
-// Build color swatches
+function formatDate(value) {
+  if (!value) return '';
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? '' : date.toLocaleString();
+}
+
+function rowToStyle(row) {
+  return {
+    bgColor: row?.bg_color,
+    fontFamily: row?.font_family,
+    textSize: row?.text_size
+  };
+}
+
+// Build colour swatches
 if (bgSwatchesEl) {
   ALLOWED_BG.forEach((color, idx) => {
     const btn = document.createElement('button');
@@ -49,22 +63,13 @@ if (bgSwatchesEl) {
     bgSwatchesEl.appendChild(btn);
   });
 
-  // default select first color for textarea only
   if (bgSwatchesEl.firstChild) {
     bgSwatchesEl.firstChild.click();
   }
 }
 
-function rowToStyle(row) {
-  return {
-    bgColor: row?.bg_color,
-    fontFamily: row?.font_family,
-    textSize: row?.text_size
-  };
-}
-
 function applyStyle(style) {
-  if (!style) return;
+  if (!style || !messageBoxEl) return;
 
   if (style.bgColor && ALLOWED_BG.includes(style.bgColor)) {
     messageBoxEl.style.backgroundColor = style.bgColor;
@@ -84,7 +89,7 @@ function applyStyle(style) {
     }
   }
 
-  if (style.fontFamily) {
+  if (style.fontFamily && currentMessageEl) {
     currentMessageEl.style.fontFamily = style.fontFamily;
 
     if (fontSelectEl) {
@@ -92,7 +97,7 @@ function applyStyle(style) {
     }
   }
 
-  if (style.textSize) {
+  if (style.textSize && messageBoxEl) {
     messageBoxEl.classList.remove('size-small', 'size-medium', 'size-large');
     messageBoxEl.classList.add(`size-${style.textSize}`);
 
@@ -102,7 +107,6 @@ function applyStyle(style) {
   }
 }
 
-// Helpers to keep textarea as live preview
 const sizeToRem = (v) =>
   v === 'small' ? '1rem' : v === 'large' ? '1.5rem' : '1.25rem';
 
@@ -135,11 +139,15 @@ if (sizeSelectEl) {
 
 async function loadMessage() {
   try {
+    if (!sb) {
+      throw new Error('Supabase client not loaded');
+    }
+
     const { data, error } = await sb
       .from('messages')
       .select('id, message, created_at, bg_color, font_family, text_size')
       .eq('location', 'default')
-      .order('created_at', { ascending: false })
+      .order('created_at', { ascending: false, nullsFirst: false })
       .order('id', { ascending: false })
       .limit(1)
       .maybeSingle();
@@ -150,7 +158,7 @@ async function loadMessage() {
       const style = rowToStyle(data);
 
       currentMessageEl.textContent = data.message;
-      timestampEl.textContent = new Date(data.created_at).toLocaleString();
+      timestampEl.textContent = formatDate(data.created_at);
 
       applyStyle(style);
       syncTextareaFromControls();
@@ -206,23 +214,30 @@ form.addEventListener('submit', async (e) => {
   statusEl.textContent = 'Sending...';
 
   try {
+    if (!sb) {
+      throw new Error('Supabase client not loaded');
+    }
+
+    const createdAt = new Date().toISOString();
+
     const { data, error } = await sb
       .from('messages')
       .insert({
         location: 'default',
         message,
+        created_at: createdAt,
         bg_color: bgSwatchesEl?.dataset.selected || null,
         font_family: fontSelectEl?.value || 'system-ui',
         text_size: sizeSelectEl?.value || 'medium'
       })
-      .select('created_at, bg_color, font_family, text_size')
+      .select('id, created_at, bg_color, font_family, text_size')
       .single();
 
     if (error) throw error;
 
     statusEl.textContent = 'Thanks! Message saved.';
     currentMessageEl.textContent = message;
-    timestampEl.textContent = new Date(data.created_at).toLocaleString();
+    timestampEl.textContent = formatDate(data.created_at || createdAt);
 
     applyStyle(rowToStyle(data));
 
@@ -294,7 +309,6 @@ if (refreshButton) {
   refreshButton.addEventListener('click', setRandomInspo);
 }
 
-// Check if user has posted before and show the button
 if (sessionStorage.getItem('hasPosted') === '1' && viewAllSectionEl) {
   viewAllSectionEl.style.display = 'block';
 }
