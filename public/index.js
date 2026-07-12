@@ -38,6 +38,15 @@ function rowToStyle(row) {
 }
 
 // Build colour swatches
+// If we were reached via a personal QR (sheffmsg.fun/<code>), grab the code from
+// the URL so we can attribute the message and notify the code's owner. On the
+// plain root ("/") this is null and the page behaves exactly as before.
+const REFERRAL_CODE = (() => {
+  const seg = window.location.pathname.replace(/^\/+/, '').split('/')[0];
+  return /^[A-Za-z0-9]{6,10}$/.test(seg) ? seg : null;
+})();
+
+// Build color swatches
 if (bgSwatchesEl) {
   ALLOWED_BG.forEach((color, idx) => {
     const btn = document.createElement('button');
@@ -214,10 +223,17 @@ form.addEventListener('submit', async (e) => {
   statusEl.textContent = 'Sending...';
 
   try {
-    if (!sb) {
-      throw new Error('Supabase client not loaded');
-    }
-
+    const res = await fetch('/api/message', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message,
+        bgColor: bgSwatchesEl?.dataset.selected,
+        fontFamily: fontSelectEl?.value,
+        textSize: sizeSelectEl?.value,
+        code: REFERRAL_CODE
+      })
+    });
     const createdAt = new Date().toISOString();
 
     const { data, error } = await sb

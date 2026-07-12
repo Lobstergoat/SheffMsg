@@ -3,9 +3,12 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import basicAuth from 'basic-auth';
 import path from 'path';
+import crypto from 'crypto';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import QRCode from 'qrcode';
 import { getDb, migrate } from './db.js';
+import { sendReferralNotification, sendWelcomeEmail } from './email.js';
 
 dotenv.config();
 
@@ -81,6 +84,64 @@ const postLimiter = rateLimit({
   legacyHeaders: false
 });
 
+const referralLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 20,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false
+});
+
+// Public base URL used when encoding personal QR codes (no trailing slash).
+const PUBLIC_BASE_URL = (process.env.PUBLIC_BASE_URL || `http://localhost:${port}`).replace(/\/+$/, '');
+
+// Personal referral codes: 8 chars, unreserved alphabet. The catch-all route and
+// the client both accept 6-10 alphanumeric chars, keeping older codes valid forever.
+const CODE_ALPHABET = 'abcdefghjkmnpqrstuvwxyz23456789'; // no ambiguous 0/o/1/i/l
+const CODE_RE = /^[A-Za-z0-9]{6,10}$/;
+// Single-segment paths that must never be treated as a referral code.
+const RESERVED_CODES = new Set(['spread', 'admin', 'api', 'healthz', 'messages', 'index', 'styles', 'favicon']);
+
+function generateCode(len = 8) {
+  const bytes = crypto.randomBytes(len);
+  let out = '';
+  for (let i = 0; i < len; i++) out += CODE_ALPHABET[bytes[i] % CODE_ALPHABET.length];
+  return out;
+}
+
+// Create a brand-new, guaranteed-unique referral code row (email unbound).
+function createReferralCode() {
+  const nowIso = new Date().toISOString();
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const code = generateCode();
+    try {
+      db.prepare('INSERT INTO referrals (code, email, created_at) VALUES (?, NULL, ?)').run(code, nowIso);
+      return code;
+    } catch (e) {
+      // UNIQUE collision — try again with a fresh code.
+      if (String(e.message).includes('UNIQUE')) continue;
+      throw e;
+    }
+  }
+  throw new Error('Could not allocate a unique referral code');
+}
+
+function referralUrl(code) {
+  return `${PUBLIC_BASE_URL}/${code}`;
+}
+
+function qrDataUrl(code) {
+  return QRCode.toDataURL(referralUrl(code), { errorCorrectionLevel: 'H', margin: 2, width: 420 });
+}
+
+function validateEmail(raw) {
+  const v = String(raw || '').trim();
+  if (v.length === 0) return { ok: false, error: 'Email is required' };
+  if (v.length > 254) return { ok: false, error: 'Email too long' };
+  // Deliberately simple: one @, something either side, a dot in the domain.
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return { ok: false, error: 'Please enter a valid email' };
+  return { ok: true, value: v.toLowerCase() };
+}
+
 // Static files
 const publicDir = path.join(process.cwd(), 'public');
 app.use(express.static(publicDir));
@@ -124,7 +185,70 @@ app.post('/api/message', postLimiter, (req, res) => {
   const nowIso = new Date().toISOString();
   db.prepare('INSERT INTO messages (location, message, created_at, bg_color, font_family, text_size) VALUES (?, ?, ?, ?, ?, ?)')
     .run(location, validation.value, nowIso, bg, font, size);
+
+  // If this message was left via a personal referral QR (sheffmsg.fun/<code>),
+  // notify the code's owner. Never let email issues affect the message flow.
+  const rawCode = req.body?.code;
+  if (typeof rawCode === 'string' && CODE_RE.test(rawCode)) {
+    const owner = db.prepare('SELECT email FROM referrals WHERE code = ?').get(rawCode);
+    if (owner && owner.email) {
+      sendReferralNotification({ to: owner.email, message: validation.value })
+        .catch((err) => console.error('[email] notification failed:', err.message));
+    }
+  }
+
   res.status(201).json({ ok: true, createdAt: nowIso, style: { bgColor: bg, fontFamily: font, textSize: size } });
+});
+
+// --- Personal referral QR endpoints ---
+
+// Generate a brand-new personal code (email not yet bound) + its QR image.
+app.get('/api/referral/new', referralLimiter, async (req, res) => {
+  try {
+    const code = createReferralCode();
+    const qr = await qrDataUrl(code);
+    res.json({ code, url: referralUrl(code), qrDataUrl: qr, hasEmail: false });
+  } catch (e) {
+    res.status(500).json({ error: 'Could not create a code, please try again' });
+  }
+});
+
+// Fetch an existing code (so a returning visitor keeps the same QR).
+app.get('/api/referral/:code', referralLimiter, async (req, res) => {
+  const code = req.params.code;
+  if (!CODE_RE.test(code)) return res.status(400).json({ error: 'Invalid code' });
+  const row = db.prepare('SELECT code, email FROM referrals WHERE code = ?').get(code);
+  if (!row) return res.status(404).json({ error: 'Code not found' });
+  try {
+    const qr = await qrDataUrl(row.code);
+    res.json({ code: row.code, url: referralUrl(row.code), qrDataUrl: qr, hasEmail: !!row.email });
+  } catch (e) {
+    res.status(500).json({ error: 'Could not render QR' });
+  }
+});
+
+// Bind an email to an existing code so the owner gets notified, and email them
+// their personal QR (as a PNG attachment) to print later.
+app.post('/api/referral/:code/email', referralLimiter, async (req, res) => {
+  const code = req.params.code;
+  if (!CODE_RE.test(code)) return res.status(400).json({ error: 'Invalid code' });
+  const row = db.prepare('SELECT code FROM referrals WHERE code = ?').get(code);
+  if (!row) return res.status(404).json({ error: 'Code not found' });
+  const emailCheck = validateEmail(req.body?.email);
+  if (!emailCheck.ok) return res.status(400).json({ error: emailCheck.error });
+  db.prepare('UPDATE referrals SET email = ?, email_set_at = ? WHERE code = ?')
+    .run(emailCheck.value, new Date().toISOString(), code);
+
+  // Send the "thanks for helping" email with the QR attached. We await so the
+  // UI can tell the user whether it went out, but a failure never blocks signup.
+  let emailed = false;
+  try {
+    const qrPngBase64 = (await qrDataUrl(code)).split(',')[1];
+    emailed = await sendWelcomeEmail({ to: emailCheck.value, url: referralUrl(code), qrPngBase64 });
+  } catch (err) {
+    console.error('[email] welcome email failed:', err.message);
+  }
+  res.json({ ok: true, emailed });
 });
 
 // Admin basic auth middleware
@@ -168,6 +292,20 @@ app.delete('/api/admin/messages/:id', adminAuth, (req, res) => {
 
 app.get('/healthz', (req, res) => {
   res.json({ status: 'ok', env: nodeEnv });
+});
+
+// The "Help spread the cause" page where visitors get their personal QR.
+app.get('/spread', (req, res) => {
+  res.sendFile(path.join(publicDir, 'spread.html'));
+});
+
+// Personal QR landing: sheffmsg.fun/<code> serves the exact same message page as
+// the root. It functions identically — index.js reads the code from the URL and
+// attaches it to the message POST so the code's owner gets notified. Static files
+// and all routes above are matched first, so nothing existing is affected.
+app.get('/:code([A-Za-z0-9]{6,10})', (req, res, next) => {
+  if (RESERVED_CODES.has(req.params.code.toLowerCase())) return next();
+  res.sendFile(path.join(publicDir, 'index.html'));
 });
 
 app.listen(port, () => {

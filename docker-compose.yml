@@ -10,6 +10,9 @@ services:
       - ADMIN_USER=${ADMIN_USER:-admin}
       - ADMIN_PASS=${ADMIN_PASS:-changeme}
       - CORS_ORIGINS=${CORS_ORIGINS:-}
+      - PUBLIC_BASE_URL=${PUBLIC_BASE_URL:-}
+      - RESEND_API_KEY=${RESEND_API_KEY:-}
+      - NOTIFY_FROM_EMAIL=${NOTIFY_FROM_EMAIL:-}
     ports:
       - "3000:3000"
     volumes:

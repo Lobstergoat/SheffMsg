@@ -130,3 +130,141 @@ body { background: var(--bg); color: var(--fg); }
     width: 100%;
   }
 } */
+
+/* --- Footer --- */
+.site-footer {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
+  text-align: center;
+  border-top: 1px solid #20242a;
+}
+.footer-link {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 1rem;
+  text-decoration: none;
+  border: 1px solid #20242a;
+  background: #111316;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+.footer-link:hover { background: #20242a; transform: translateY(-2px); }
+
+/* --- Spread / personal QR page --- */
+.qr-card {
+  margin: 1.5rem 0 2rem;
+  padding: 1.5rem;
+  border: 1px solid #20242a;
+  border-radius: 12px;
+  background: #111316;
+  text-align: center;
+}
+.qr-image {
+  width: 260px;
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  background: #fff;
+  padding: 12px;
+  display: block;
+  margin: 0 auto 1rem;
+}
+.qr-url {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.qr-url code {
+  color: var(--muted);
+  font-size: 0.95rem;
+  word-break: break-all;
+}
+.copy-btn {
+  padding: 0.5rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid #20242a;
+  background: #2b3138;
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.copy-btn:hover { background: #30363d; }
+
+.email-form { margin: 0 0 2rem; }
+.email-form .prompt {
+  display: block;
+  margin-bottom: 0.75rem;
+  color: var(--muted);
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+.email-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.email-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.85rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid #20242a;
+  background: #0e1013;
+  color: var(--fg);
+  font-size: 1rem;
+}
+.email-input:focus { outline: none; border-color: var(--accent); }
+.email-form button[type="submit"] {
+  margin: 0; /* override .form-section button margin-top which misaligns the row */
+  padding: 0.85rem 1.5rem;
+  border-radius: 12px;
+  border: 0;
+  background: var(--accent);
+  color: #0a0a0a;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.email-row { align-items: stretch; }
+.email-form button[type="submit"]:hover { filter: brightness(0.95); }
+.email-form button[type="submit"]:disabled { opacity: 0.6; cursor: default; }
+
+.instructions {
+  margin: 1rem 0 2rem;
+  padding: 1.5rem;
+  border: 1px solid #20242a;
+  border-radius: 12px;
+  background: #111316;
+}
+.instructions h2 {
+  margin: 0 0 1rem;
+  font-size: 1.15rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+.instructions ol {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--fg);
+  line-height: 1.7;
+}
+.instructions li { margin-bottom: 0.5rem; }
+.instructions a { color: var(--accent); }
+
+/* Accent "pop" for the price + the sticker link */
+.instructions .pop {
+  color: var(--accent);
+  font-weight: 800;
+}
+.instructions .pop-link {
+  color: var(--accent);
+  font-weight: 800;
+  text-decoration: none;
+  border-bottom: 2px solid var(--accent);
+  white-space: nowrap;
+  transition: opacity 0.2s ease;
+}
+.instructions .pop-link:hover { opacity: 0.8; }

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Your Personal QR</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <main class="container">
+    <h1 class="site-title">Your personal QR code</h1>
+
+    <section class="qr-card">
+      <img id="qrImage" class="qr-image" alt="Your personal QR code" />
+      <div class="qr-url">
+        <code id="qrUrl">Generating your code…</code>
+        <button type="button" id="copyBtn" class="copy-btn">Copy link</button>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <form id="emailForm" class="email-form">
+        <label class="prompt" for="emailInput">Enter your email and get notified when someone scans your QR code!</label>
+        <div class="email-row">
+          <input type="email" id="emailInput" class="email-input" placeholder="you@example.com" autocomplete="email" required />
+          <button type="submit">Notify me</button>
+        </div>
+        <div id="emailStatus" class="status" role="status" aria-live="polite"></div>
+      </form>
+    </section>
+
+    <!-- EDIT ME: tweak the wording freely. The sticker link + price pop in the
+         site's accent green via the .pop class and the styled anchor. -->
+    <section class="instructions">
+      <h2>How it works</h2>
+      <ol>
+        <li>Print your personal sticker for just <span class="pop">18p</span> per <span class="pop">100</span> at:
+          <a href="https://www.discountstickerprinting.co.uk/" class="pop-link" target="_blank" rel="noopener">discountstickerprinting.co.uk</a></li>
+        <li>Stick them up in public places near you</li>
+        <li>Get notified when someone leaves a message using your QR code!</li>
+      </ol>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <a href="/" class="footer-link">← Back to SheffMsg</a>
+  </footer>
+
+  <script src="/spread.js" defer></script>
+</body>
+</html>

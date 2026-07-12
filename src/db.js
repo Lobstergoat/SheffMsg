@@ -28,6 +28,18 @@ export function migrate() {
     );
     CREATE INDEX IF NOT EXISTS idx_messages_location_created_at
       ON messages (location, created_at DESC);
+
+    -- Personal referral QR codes. Each code is unique and permanent: once created
+    -- it always maps to the same sheffmsg.fun/<code> URL and stays bound to the
+    -- email the owner registers. Kept intentionally minimal but structured so that
+    -- leaderboard/points/etc. can be layered on later without reworking this.
+    CREATE TABLE IF NOT EXISTS referrals (
+      code TEXT PRIMARY KEY,
+      email TEXT,
+      created_at TEXT NOT NULL,
+      email_set_at TEXT
+    );
+    CREATE INDEX IF NOT EXISTS idx_referrals_email ON referrals (email);
   `);
   // In case table existed without new columns, try to add them (ignore failures)
   try { db.exec('ALTER TABLE messages ADD COLUMN bg_color TEXT'); } catch {}
