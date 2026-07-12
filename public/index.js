@@ -46,6 +46,23 @@ const REFERRAL_CODE = (() => {
   return /^[A-Za-z0-9]{6,10}$/.test(seg) ? seg : null;
 })();
 
+// Ask the Supabase Edge Function to email the code's owner. Fire-and-forget:
+// never blocks or breaks message posting, and degrades quietly if the function
+// isn't deployed yet (e.g. before the Resend key is configured).
+function notifyReferralOwner(code, message) {
+  try {
+    fetch(`${window.SHEFFMSG_SUPABASE_URL}/functions/v1/referral-mailer`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        apikey: window.SHEFFMSG_SUPABASE_KEY,
+        Authorization: `Bearer ${window.SHEFFMSG_SUPABASE_KEY}`
+      },
+      body: JSON.stringify({ action: 'notify', code, message })
+    }).catch(() => {});
+  } catch { /* ignore */ }
+}
+
 // Build color swatches
 if (bgSwatchesEl) {
   ALLOWED_BG.forEach((color, idx) => {
@@ -223,33 +240,30 @@ form.addEventListener('submit', async (e) => {
   statusEl.textContent = 'Sending...';
 
   try {
-    const res = await fetch('/api/message', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        message,
-        bgColor: bgSwatchesEl?.dataset.selected,
-        fontFamily: fontSelectEl?.value,
-        textSize: sizeSelectEl?.value,
-        code: REFERRAL_CODE
-      })
-    });
     const createdAt = new Date().toISOString();
+
+    const row = {
+      location: 'default',
+      message,
+      created_at: createdAt,
+      bg_color: bgSwatchesEl?.dataset.selected || null,
+      font_family: fontSelectEl?.value || 'system-ui',
+      text_size: sizeSelectEl?.value || 'medium'
+    };
+    // Only attach the referral code on personal-QR pages, so the normal feed keeps
+    // working even before the messages.code column is added (see supabase/schema.sql).
+    if (REFERRAL_CODE) row.code = REFERRAL_CODE;
 
     const { data, error } = await sb
       .from('messages')
-      .insert({
-        location: 'default',
-        message,
-        created_at: createdAt,
-        bg_color: bgSwatchesEl?.dataset.selected || null,
-        font_family: fontSelectEl?.value || 'system-ui',
-        text_size: sizeSelectEl?.value || 'medium'
-      })
+      .insert(row)
       .select('id, created_at, bg_color, font_family, text_size')
       .single();
 
     if (error) throw error;
+
+    // If left via a personal QR (sheffmsg.fun/<code>), notify the code's owner.
+    if (REFERRAL_CODE) notifyReferralOwner(REFERRAL_CODE, message);
 
     statusEl.textContent = 'Thanks! Message saved.';
     currentMessageEl.textContent = message;

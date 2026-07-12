@@ -22,10 +22,13 @@ app.use(helmet({
     useDefaults: true,
     directives: {
       "default-src": ["'self'"],
-      "script-src": ["'self'"],
+      // The frontend loads Supabase + QR libs from jsdelivr and talks to Supabase,
+      // and uses a small inline path-restore script (see index.html / 404.html).
+      // The live static host has no CSP, so this keeps local dev consistent.
+      "script-src": ["'self'", "'unsafe-inline'", 'https://cdn.jsdelivr.net'],
       "style-src": ["'self'", "'unsafe-inline'"],
       "img-src": ["'self'", 'data:'],
-      "connect-src": ["'self'"],
+      "connect-src": ["'self'", 'https://*.supabase.co'],
       "base-uri": ["'self'"],
       "form-action": ["'self'"],
       "frame-ancestors": ["'none'"]
