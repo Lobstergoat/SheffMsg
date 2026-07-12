@@ -6,6 +6,7 @@
 const qrImage = document.getElementById('qrImage');
 const qrUrlEl = document.getElementById('qrUrl');
 const copyBtn = document.getElementById('copyBtn');
+const newCodeBtn = document.getElementById('newCodeBtn');
 const emailForm = document.getElementById('emailForm');
 const emailInput = document.getElementById('emailInput');
 const emailStatus = document.getElementById('emailStatus');
@@ -81,6 +82,12 @@ copyBtn.addEventListener('click', async () => {
     copyBtn.textContent = 'Copy failed';
   }
   setTimeout(() => { copyBtn.textContent = 'Copy link'; }, 1500);
+});
+
+// Generate a fresh code + QR (handy for testing, or if you want a new sticker).
+newCodeBtn.addEventListener('click', () => {
+  render(generateCode());
+  emailStatus.textContent = '';
 });
 
 // Fire-and-forget welcome email via the Supabase Edge Function. Degrades quietly

@@ -1,7 +1,1 @@
-# Cloudflare Pages SPA fallback.
-# Personal QR codes point at sheffmsg.fun/<code>, which has no matching file.
-# This serves the normal message page (index.html) for any such path WITHOUT a
-# redirect (200 = rewrite), so the URL stays as /<code> and index.js can read the
-# code. Real files and clean URLs (/spread, /messages, /styles.css, ...) are
-# matched first and served normally.
-/*    /index.html    200
+/*    /    200
