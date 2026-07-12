@@ -1,1 +1,3 @@
-/*    /    200
+# Intentionally empty — personal QR codes use a hash URL (sheffmsg.fun/#<code>),
+# which loads the normal homepage directly, so no SPA rewrite is needed. A rewrite
+# rule here on Cloudflare Pages also captured static assets (CSS/JS) and broke them.

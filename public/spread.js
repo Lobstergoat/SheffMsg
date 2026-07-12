@@ -54,7 +54,9 @@ function makeQrPng(text, size = 460, margin = 4) {
 
 function render(code) {
   currentCode = code;
-  currentUrl = `${location.origin}/${code}`;
+  // Hash URL: loads the normal (styled) homepage on any static host with no
+  // server routing. index.js reads the code from the hash.
+  currentUrl = `${location.origin}/#${code}`;
   localStorage.setItem(STORAGE_KEY, code);
   try {
     currentQrPng = makeQrPng(currentUrl);

@@ -42,8 +42,13 @@ function rowToStyle(row) {
 // the URL so we can attribute the message and notify the code's owner. On the
 // plain root ("/") this is null and the page behaves exactly as before.
 const REFERRAL_CODE = (() => {
+  const re = /^[A-Za-z0-9]{6,10}$/;
+  // Personal QRs encode sheffmsg.fun/#<code> — the hash keeps us on the real,
+  // styled homepage on any static host. Fall back to a /<code> path segment.
+  const hash = window.location.hash.replace(/^#\/?/, '');
+  if (re.test(hash)) return hash;
   const seg = window.location.pathname.replace(/^\/+/, '').split('/')[0];
-  return /^[A-Za-z0-9]{6,10}$/.test(seg) ? seg : null;
+  return re.test(seg) ? seg : null;
 })();
 
 // Ask the Supabase Edge Function to email the code's owner. Fire-and-forget:
