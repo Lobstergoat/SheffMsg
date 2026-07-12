@@ -132,7 +132,7 @@ emailForm.addEventListener('submit', async (e) => {
   emailStatus.textContent = "You're all set! We'll email you when someone leaves a message.";
   const welcomed = await sendWelcome(currentCode, email);
   if (welcomed) {
-    emailStatus.textContent = "You're all set! Check your inbox — we've emailed your QR to print. We'll also email you when someone leaves a message.";
+    emailStatus.textContent = "You're all set! Check your inbox, we've emailed your QR to print. We'll also email you when someone leaves a message.";
   }
 });
 
